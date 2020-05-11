@@ -207,3 +207,27 @@ def disableconcurrentbuildsjobproperty(top, parent):
     # concurrent is false by default anyway, so just going to ignore it
     # Check cli.py root_to_yaml func for more info
     pass
+
+def authorizationmatrixproperty(top, parent):
+    permissions = {
+        'hudson.model.Item.Build': 'job-build',
+        'hudson.model.Item.Cancel': 'job-cancel',
+        'hudson.model.Item.Configure': 'job-configure',
+        'hudson.model.Item.Create': 'job-create',
+        'hudson.model.Item.Discover': 'job-discover',
+        'hudson.model.Item.Read': 'job-read',
+    }
+    authorization = {}
+    for child in top:
+        if child.tag == 'inheritanceStrategy':
+            class_ = child.get('class')
+            if class_ != 'org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy':
+                raise NotImplementedError('cannot handle inheritance stratedy - not implemented in JJB')
+        elif child.tag == 'permission':
+            permission, name = child.text.split(':', 1)
+            if name not in authorization:
+                authorization[name] = []
+            authorization[name].append(permissions[permission])
+        else:
+            raise NotImplementedError('cannot handle XML %s' % child.tag)
+    parent.append({'authorization': authorization})
