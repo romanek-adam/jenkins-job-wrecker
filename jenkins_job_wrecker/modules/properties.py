@@ -1,7 +1,10 @@
 # encoding=utf8
+import logging
 import jenkins_job_wrecker.modules.base
 from jenkins_job_wrecker.helpers import get_bool, gen_raw
 from jenkins_job_wrecker.modules.triggers import Triggers
+
+log = logging.getLogger()
 
 PARAMETER_MAPPER = {
     'stringparameterdefinition': 'string',
@@ -9,6 +12,7 @@ PARAMETER_MAPPER = {
     'choiceparameterdefinition': 'choice',
     'textparameterdefinition': 'text',
     'fileparameterdefinition': 'file',
+    'labelparameterdefinition': 'label',
 }
 
 
@@ -115,7 +119,14 @@ def parameters(top, parent):
             parameter = {}
             for setting in param:
                 key = {'defaultValue': 'default'}.get(setting.tag, setting.tag)
-                if setting.text is None:
+                if param_type == 'label':
+                    if key in ['default', 'description', 'name']:
+                        parameter[key] = setting.text
+                    elif key == 'allNodesMatchingLabel':
+                        parameter['all-nodes'] = (setting.text == 'true')
+                    else:
+                        log.warning('Skipping label parameter setting: {}'.format(setting.tag))
+                elif setting.text is None:
                     parameter[key] = ''
                 elif param_type == 'bool' and (setting.text == 'true' or setting.text == 'false'):
                     parameter[key] = (setting.text == 'true')
@@ -231,3 +242,36 @@ def authorizationmatrixproperty(top, parent):
         else:
             raise NotImplementedError('cannot handle XML %s' % child.tag)
     parent.append({'authorization': authorization})
+
+def buildblockerproperty(top, parent):
+    for child in top:
+        if child.tag == 'useBuildBlocker':
+            if child.text == 'true':
+                raise NotImplementedError('Unsupported property')
+            else:
+                # assuming build-blocker is disabled we can skip the whole configuration
+                pass
+
+def rebuildsettings(top, parent):
+    rebuild = {}
+    for child in top:
+        if child.tag == 'autoRebuild':
+            rebuild['auto-rebuild'] = (child.text == 'true')
+        elif child.tag == 'rebuildDisabled':
+            rebuild['rebuild-disabled'] = (child.text == 'true')
+        else:
+            raise NotImplementedError('Unsupported tag')
+    parent.append({'rebuild': rebuild})
+
+# JJB doesn't support this plugin, to be verified if we can skip it
+def naginatoroptoutproperty(top, parent):
+    for child in top:
+        if child.tag == 'optOut':
+            if child.text == 'true':
+                raise NotImplementedError('Unsupported value')
+            else:
+                # TODO: assuming this is ok to skip the whole configuration
+                # see https://github.com/jenkinsci/naginator-plugin/blob/master/src/main/java/com/chikli/hudson/plugin/naginator/NaginatorActionFactory.java#L25
+                pass
+        else:
+            raise NotImplementedError('Unsupported tag: {}'.format(child.tag))
