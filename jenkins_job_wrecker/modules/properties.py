@@ -1,4 +1,5 @@
 # encoding=utf8
+import logging
 import jenkins_job_wrecker.modules.base
 from jenkins_job_wrecker.helpers import get_bool, gen_raw
 from jenkins_job_wrecker.modules.triggers import Triggers
@@ -9,6 +10,7 @@ PARAMETER_MAPPER = {
     'choiceparameterdefinition': 'choice',
     'textparameterdefinition': 'text',
     'fileparameterdefinition': 'file',
+    'labelparameterdefinition': 'label',
 }
 
 
@@ -115,7 +117,14 @@ def parameters(top, parent):
             parameter = {}
             for setting in param:
                 key = {'defaultValue': 'default'}.get(setting.tag, setting.tag)
-                if setting.text is None:
+                if param_type == 'label':
+                    if key in ['default', 'description', 'name']:
+                        parameter[key] = setting.text
+                    elif key == 'allNodesMatchingLabel':
+                        parameter['all-nodes'] = (setting.text == 'true')
+                    else:
+                        logging.warning('Skipping label parameter setting: {}'.format(setting.tag))
+                elif setting.text is None:
                     parameter[key] = ''
                 elif param_type == 'bool' and (setting.text == 'true' or setting.text == 'false'):
                     parameter[key] = (setting.text == 'true')
