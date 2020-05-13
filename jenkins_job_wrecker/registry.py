@@ -1,6 +1,7 @@
 # encoding=utf8
 from __future__ import print_function
 
+import logging
 from importlib import import_module
 from inspect import getmembers, isfunction, isclass
 from jenkins_job_wrecker.helpers import gen_raw
@@ -69,6 +70,7 @@ class Registry(object):
                 return
             elif component == 'handlers':
                 raise
+            logging.warning('Handler error: {}, generating RAW XML'.format(e))
             gen_raw(xml, parent)
 
     def __handlers(self):
