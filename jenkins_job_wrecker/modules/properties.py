@@ -225,6 +225,12 @@ def authorizationmatrixproperty(top, parent):
         'hudson.model.Item.Create': 'job-create',
         'hudson.model.Item.Discover': 'job-discover',
         'hudson.model.Item.Read': 'job-read',
+        'hudson.model.Item.ViewStatus': 'job-status',
+        'hudson.model.Item.Workspace': 'job-workspace',
+        'hudson.model.Run.Delete': 'run-delete',
+        'hudson.model.Run.Replay': 'run-replay',
+        'hudson.model.Run.Update': 'run-update',
+        'hudson.scm.SCM.Tag': 'scm-tag'
     }
     authorization = {}
     for child in top:
