@@ -154,6 +154,8 @@ def prebuildcleanup(top, parent):
                     rule_type = subelement.find('type').text.lower()
                     rule_patt = subelement.find('pattern').text
                     preclean_patterns[rule_type] = rule_patt
+        elif element.tag == 'disableDeferredWipeout':
+            preclean['disable-deferred-wipeout'] = (element.text == 'true')
         elif element.tag == 'cleanupParameter':
             # JJB does not seem to support this. Ignored.
             pass
