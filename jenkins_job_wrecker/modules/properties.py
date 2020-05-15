@@ -207,3 +207,37 @@ def disableconcurrentbuildsjobproperty(top, parent):
     # concurrent is false by default anyway, so just going to ignore it
     # Check cli.py root_to_yaml func for more info
     pass
+
+
+def buildblockerproperty(top, parent):
+    for child in top:
+        if child.tag == 'useBuildBlocker':
+            if child.text == 'true':
+                raise NotImplementedError('Unsupported property')
+            else:
+                # assuming build-blocker is disabled we can skip the whole configuration
+                pass
+
+def rebuildsettings(top, parent):
+    rebuild = {}
+    for child in top:
+        if child.tag == 'autoRebuild':
+            rebuild['auto-rebuild'] = (child.text == 'true')
+        elif child.tag == 'rebuildDisabled':
+            rebuild['rebuild-disabled'] = (child.text == 'true')
+        else:
+            raise NotImplementedError('Unsupported tag')
+    parent.append({'rebuild': rebuild})
+
+# JJB doesn't support this plugin, to be verified if we can skip it
+def naginatoroptoutproperty(top, parent):
+    for child in top:
+        if child.tag == 'optOut':
+            if child.text == 'true':
+                raise NotImplementedError('Unsupported value')
+            else:
+                # TODO: assuming this is ok to skip the whole configuration
+                # see https://github.com/jenkinsci/naginator-plugin/blob/master/src/main/java/com/chikli/hudson/plugin/naginator/NaginatorActionFactory.java#L25
+                pass
+        else:
+            raise NotImplementedError('Unsupported tag: {}'.format(child.tag))
