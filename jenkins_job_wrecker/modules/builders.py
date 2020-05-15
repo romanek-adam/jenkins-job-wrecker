@@ -1,5 +1,7 @@
 # encoding=utf8
 import jenkins_job_wrecker.modules.base
+from distutils.util import strtobool
+
 
 
 class Builders(jenkins_job_wrecker.modules.base.Base):
@@ -102,3 +104,20 @@ def batchfile(child, parent):
                                       "XML %s" % shell_element.tag)
 
     parent.append({'batch': shell})
+
+def buildnameupdater(child, parent):
+    build_name = {}
+    for build_name_element in child:
+        if build_name_element.tag == "buildName":
+            build_name["name"] = build_name_element.text
+        if build_name_element.tag == "macroTemplate":
+            build_name["template"] = build_name_element.text
+        if build_name_element.tag == "fromFile":
+            build_name["file"] = bool(strtobool(build_name_element.text))
+        if build_name_element.tag == "fromMacro":
+            build_name["macro"] = bool(strtobool(build_name_element.text))
+        if build_name_element.tag == "macroFirst":
+            build_name["macro-first"] = bool(strtobool(build_name_element.text))
+
+    parent.append({'build-name-setter': build_name})
+
