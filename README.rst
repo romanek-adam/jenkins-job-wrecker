@@ -1,8 +1,8 @@
 Jenkins Job Wrecker
 -------------------
 
-.. image:: https://travis-ci.org/ktdreyer/jenkins-job-wrecker.svg?branch=master
-       :target: https://travis-ci.org/ktdreyer/jenkins-job-wrecker
+.. image:: https://travis-ci.com/ktdreyer/jenkins-job-wrecker.svg?branch=master
+       :target: https://travis-ci.com/ktdreyer/jenkins-job-wrecker
 
 .. image:: https://badge.fury.io/py/jenkins-job-wrecker.svg
        :target: https://badge.fury.io/py/jenkins-job-wrecker
@@ -75,7 +75,7 @@ CA's public cert to your system certificate store:
 * Fedora: ``/etc/pki/tls/certs`` directory,
 * Ubuntu: ``/usr/local/share/ca-certificates/``
 
-After you've placed the PEM-formmated file there, run ``c_reshash`` in that
+After you've placed the PEM-formatted file there, run ``c_reshash`` in that
 directory to create the CA certificate hash symlink.  jjwrecker uses
 python-jenkins, which in turn uses six's urllib, and that library will validate
 HTTPS connections based on this openssl-hashed directory of certificates.
