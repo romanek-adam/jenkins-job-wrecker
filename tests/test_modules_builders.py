@@ -21,4 +21,5 @@ class TestBuildNameSetter(object):
         assert build_name_setter["macro"] == True
         assert build_name_setter["macro-first"] == False
         assert build_name_setter["name"] == "version.txt"
-        assert build_name_setter["template"] == '#${BUILD_NUMBER}-${FILE,path="BUILD_NAMER"}'
+        template_expected = '#${BUILD_NUMBER}-${FILE,path="BUILD_NAMER"}'
+        assert build_name_setter["template"] == template_expected

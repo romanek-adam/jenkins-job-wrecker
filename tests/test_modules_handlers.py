@@ -6,7 +6,7 @@ import os
 fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'handlers')
 
 
-class TestBuildNameSetter(object):
+class TestChildCustomWorkspace(object):
     def test_basic(self):
         filename = os.path.join(fixtures_path, 'child-custom-workspace.xml')
         root = get_xml_root(filename=filename)

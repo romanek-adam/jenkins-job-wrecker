@@ -103,19 +103,22 @@ def batchfile(child, parent):
 
     parent.append({'batch': shell})
 
+
 def buildnameupdater(child, parent):
     build_name = {}
     for build_name_element in child:
         if build_name_element.tag == "buildName":
             build_name["name"] = build_name_element.text
-        if build_name_element.tag == "macroTemplate":
+        elif build_name_element.tag == "macroTemplate":
             build_name["template"] = build_name_element.text
-        if build_name_element.tag == "fromFile":
+        elif build_name_element.tag == "fromFile":
             build_name["file"] = (build_name_element.text == 'true')
-        if build_name_element.tag == "fromMacro":
+        elif build_name_element.tag == "fromMacro":
             build_name["macro"] = (build_name_element.text == 'true')
-        if build_name_element.tag == "macroFirst":
+        elif build_name_element.tag == "macroFirst":
             build_name["macro-first"] = (build_name_element.text == 'true')
+        else:
+            raise NotImplementedError("cannot handle "
+                                      "XML %s" % build_name_element.tag)
 
     parent.append({'build-name-setter': build_name})
-
