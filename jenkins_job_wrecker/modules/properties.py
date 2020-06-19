@@ -9,6 +9,7 @@ PARAMETER_MAPPER = {
     'choiceparameterdefinition': 'choice',
     'textparameterdefinition': 'text',
     'fileparameterdefinition': 'file',
+    'parameterseparatordefinition': 'parameter-separator'
 }
 
 
@@ -122,12 +123,21 @@ def parameters(top, parent):
                 elif param_type == 'choice' and setting.tag == 'choices':
                     choices = []
                     for sub_setting in setting:
-                        if(sub_setting.attrib['class'] == 'string-array'):
+                        if (sub_setting.attrib['class'] == 'string-array'):
                             for item in sub_setting:
                                 choices.append(item.text)
                         else:
                             raise NotImplementedError(sub_setting.attrib['class'])
                     parameter[key] = choices
+                elif param_type == "parameter-separator":
+                    parameter_separator_map = {
+                        "name": "name",
+                        "sectionHeader": "section-header",
+                        "sectionHeaderStyle": "section-header-style",
+                        "separatorStyle": "separator-style"
+                    }
+                    if key in parameter_separator_map:
+                        parameter[parameter_separator_map[key]] = setting.text
                 else:
                     parameter[key] = setting.text
             parent.append({param_type: parameter})
