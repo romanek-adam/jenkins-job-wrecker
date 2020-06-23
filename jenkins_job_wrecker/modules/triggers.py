@@ -213,7 +213,7 @@ def gerrittrigger(top, parent):
             gerrit_trigger["skip-vote"] = skip_vote
         elif child.tag == "notificationLevel":
             if child.text is None:
-                gerrit_trigger["notification-level"] = "NONE"
+                gerrit_trigger["notification-level"] = "SERVER_DEFAULT"
             else:
                 gerrit_trigger["notification-level"] = child.text
         elif child.tag == "triggerOnEvents":
