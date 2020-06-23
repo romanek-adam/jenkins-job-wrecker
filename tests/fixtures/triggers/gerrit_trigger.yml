@@ -77,3 +77,5 @@
         - topic-changed-event
         - wip-state-changed-event
         unstable-message: Build Unstable
+    - gerrit:
+        notification-level: SERVER_DEFAULT

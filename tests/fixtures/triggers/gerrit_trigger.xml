@@ -99,5 +99,8 @@
       <dynamicTriggerConfiguration>true</dynamicTriggerConfiguration>
       <triggerConfigURL>https://dynamictesturl.com</triggerConfigURL>
     </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger plugin="gerrit-trigger@2.30.5">
+      <notificationLevel/>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
   </triggers>
 </matrix-project>
