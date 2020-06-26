@@ -1,0 +1,18 @@
+- job:
+    name: workspace-cleanup
+    project-type: matrix
+    publishers:
+    - workspace-cleanup:
+        clean-if:
+        - aborted: true
+        - failure: true
+        - not-built: true
+        - success: true
+        - unstable: true
+        clean-parent: false
+        dirmatch: true
+        exclude: []
+        fail-build: false
+        include:
+        - onemw/build-*
+        skip-when-failed: false

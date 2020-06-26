@@ -1,0 +1,24 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<matrix-project plugin="matrix-project@1.14">
+  <publishers>
+    <hudson.plugins.ws__cleanup.WsCleanup plugin="ws-cleanup@0.37">
+      <cleanWhenAborted>true</cleanWhenAborted>
+      <cleanWhenFailure>true</cleanWhenFailure>
+      <cleanWhenNotBuilt>true</cleanWhenNotBuilt>
+      <cleanWhenSuccess>true</cleanWhenSuccess>
+      <cleanWhenUnstable>true</cleanWhenUnstable>
+      <cleanupMatrixParent>false</cleanupMatrixParent>
+      <deleteDirs>true</deleteDirs>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+      <externalDelete/>
+      <notFailBuild>true</notFailBuild>
+      <patterns>
+        <hudson.plugins.ws__cleanup.Pattern>
+          <pattern>onemw/build-*</pattern>
+          <type>INCLUDE</type>
+        </hudson.plugins.ws__cleanup.Pattern>
+      </patterns>
+      <skipWhenFailed>false</skipWhenFailed>
+    </hudson.plugins.ws__cleanup.WsCleanup>
+  </publishers>
+</matrix-project>

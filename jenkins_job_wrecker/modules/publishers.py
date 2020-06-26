@@ -361,4 +361,6 @@ def wscleanup(top, parent):
             cleanup['fail-build'] = not get_bool(cleanupel.text)
         elif cleanupel.tag == 'cleanupMatrixParent':
             cleanup['clean-parent'] = get_bool(cleanupel.text)
+        elif cleanupel.tag == 'skipWhenFailed':
+            cleanup['skip-when-failed'] = get_bool(cleanupel.text)
     parent.append({'workspace-cleanup': cleanup})
