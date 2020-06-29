@@ -17,6 +17,16 @@
               <pattern>dolor</pattern>
             </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
           </branches>
+          <topics>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Topic>
+              <compareType>PLAIN</compareType>
+              <pattern>test_123</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Topic>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Topic>
+              <compareType>REG_EXP</compareType>
+              <pattern>lorem_ipsum_regex</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Topic>
+          </topics>
           <disableStrictForbiddenFileVerification>false</disableStrictForbiddenFileVerification>
         </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
         <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>

@@ -102,7 +102,21 @@ def __gerrit_process_gerrit_projects(child):
                 forbidden_file_paths = __gerrit_process_file_paths(attribute)
                 project["forbidden-file-paths"] = forbidden_file_paths
             elif attribute.tag == "topics":
-                topics = __gerrit_process_file_paths(attribute)
+                topics = []
+                for topic in attribute:
+                    if topic.tag == \
+                            "com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Topic":
+                        topic_keys = {}
+                        for topic_attribute in topic:
+                            if topic_attribute.tag == "compareType":
+                                topic_keys["compare-type"] = topic_attribute.text
+                            elif topic_attribute.tag == "pattern":
+                                topic_keys["pattern"] = topic_attribute.text
+                            else:
+                                raise NotImplementedError("Not implemented topic attribute: ", topic_attribute.tag)
+                        topics.append(topic_keys)
+                    else:
+                        raise NotImplementedError("Not implemented topic type: ", topic.tag)
                 project["topics"] = topics
             else:
                 raise NotImplementedError("Not implemented attribute: ", attribute.tag)
