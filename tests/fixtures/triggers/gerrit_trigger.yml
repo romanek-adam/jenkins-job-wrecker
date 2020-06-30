@@ -35,6 +35,11 @@
           disable-strict-forbidden-file-verification: false
           project-compare-type: PLAIN
           project-pattern: lorem
+          topics:
+          - compare-type: PLAIN
+            pattern: test_123
+          - compare-type: REG_EXP
+            pattern: lorem_ipsum_regex
         - branches:
           - branch-compare-type: PLAIN
             branch-pattern: ipsum2
