@@ -75,15 +75,85 @@ def fingerprinter(top, parent):
     parent.append({'fingerprint': fingerprint})
 
 
+def __process_email(trigger, ext_email, provider_dict):
+    email_contents = ["subject", "recipientProviders", "body",
+                      "attachmentsPattern", "attachBuildLog", "compressBuildLog",
+                      "replyTo", "contentType"]
+    for email in trigger:
+        if email.tag == "email":
+            send_to = []
+            for email_child in email:
+                if email_child.tag == "recipientProviders":
+                    for provider in email_child:
+                        if provider.tag in provider_dict.keys():
+                            send_to.append(provider_dict[provider.tag])
+                        else:
+                            raise NotImplementedError("Provider %s under recipientProviders is not implemented."
+                                                      % provider.tag)
+                elif email_child.tag in email_contents:
+                    pass  # We only need to process recipientProviders here.
+                else:
+                    raise NotImplementedError("Subelement %s of email is not implemented."
+                                                      % email_child.tag)
+            ext_email["send-to"] = send_to
+        elif email.tag == "failureCount":
+            pass  # Handled in JJB.
+        else:
+            raise NotImplementedError("tag %s of trigger is not implemented." % email.tag)
+
+    return ext_email
+
+
+def __compare_triggers_and_process_email(trigger, ext_email, provider_dict):
+    is_equal = True
+    for email in trigger:
+        if email.tag == "email":
+            for email_child in email:
+                if email_child.tag == "subject":
+                    if email_child.text != "$PROJECT_DEFAULT_SUBJECT":
+                        is_equal = False
+                elif email_child.tag == "body":
+                    if email_child.text != "$PROJECT_DEFAULT_CONTENT":
+                        is_equal = False
+                elif email_child.tag == "recipientProviders":
+                    provider_count = 0
+                    for provider in email_child:
+                        if provider_dict[provider.tag] not in ext_email["send-to"]:
+                            is_equal = False
+                        else:
+                            provider_count += 1
+                    if provider_count != len(ext_email["send-to"]):
+                        is_equal = False
+    if not is_equal:
+        raise NotImplementedError("Trigger values mismatch the global values.")
+
+    __process_email(trigger, ext_email, provider_dict)
+
+
 def extendedemailpublisher(top, parent):
     ext_email = {}
     for element in top:
-        if element.tag == 'recipientList':
+        if element.tag == 'disabled':
+            ext_email['disable-publisher'] = get_bool(element.text)
+        elif element.tag == 'recipientList':
             ext_email['recipients'] = element.text
         elif element.tag == 'replyTo':
             ext_email['reply-to'] = element.text
+        elif element.tag == 'from':
+            ext_email['from'] = element.text or ''
         elif element.tag == 'contentType':
-            ext_email['content-type'] = element.text
+            if element.text == "both":
+                ext_email['content-type'] = "both-html-text"
+            elif element.text == "text/html":
+                ext_email['content-type'] = "html"
+            elif element.text == "text/plain":
+                ext_email['content-type'] = "text"
+            elif element.text == "default":
+                ext_email['content-type'] = "default"
+            else:
+                raise NotImplementedError('Content type %s not implemented' % element.text)
+        elif element.tag == 'compressBuildLog':
+            ext_email['compress-log'] = get_bool(element.text)
         elif element.tag == 'defaultSubject':
             ext_email['subject'] = element.text
         elif element.tag == 'defaultContent':
@@ -91,17 +161,82 @@ def extendedemailpublisher(top, parent):
         elif element.tag in ['attachBuildLog', 'compressBuildLog']:
             ext_email['attach-build-log'] = (element.text == 'true')
         elif element.tag == 'attachmentsPattern':
-            ext_email['attachment'] = element.text
-        elif element.tag in ['saveOutput', 'disabled']:
-            pass
+            ext_email['attachments'] = element.text or ''
+        elif element.tag == 'saveOutput':
+            ext_email['save-output'] = get_bool(element.text)
         elif element.tag == 'preBuild':
             ext_email['pre-build'] = (element.text == 'true')
         elif element.tag == 'presendScript':
             ext_email['presend-script'] = element.text
+        elif element.tag == 'postsendScript':
+            ext_email['postsend-script'] = element.text
         elif element.tag == 'sendTo':
             ext_email['send-to'] = element.text
         elif element.tag == 'configuredTriggers':
-            print("IGNORED configuredTriggers in email-ext")
+            trigger_prefix = "hudson.plugins.emailext.plugins.trigger."
+            trigger_dict = {
+                "AlwaysTrigger": "always",
+                "UnstableTrigger": "unstable",
+                "FirstFailureTrigger": "first-failure",
+                "FirstUnstableTrigger": "first-unstable",
+                "NotBuiltTrigger": "not-built",
+                "AbortedTrigger": "aborted",
+                "RegressionTrigger": "regression",
+                "FailureTrigger": "failure",
+                "SecondFailureTrigger": "second-failure",
+                "ImprovementTrigger": "improvement",
+                "StillFailingTrigger": "still-failing",
+                "SuccessTrigger": "success",
+                "FixedTrigger": "fixed",
+                "FixedUnhealthyTrigger": "fixed-unhealthy",
+                "StillUnstableTrigger": "still-unstable",
+                "PreBuildTrigger": "pre-build"
+            }
+            provider_dict = {
+                "hudson.plugins.emailext.plugins.recipients.UpstreamComitterRecipientProvider": "upstream-committers",
+                "hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider": "developers",
+                "hudson.plugins.emailext.plugins.recipients.RequesterRecipientProvider": "requester",
+                "hudson.plugins.emailext.plugins.recipients.CulpritsRecipientProvider": "culprits",
+                "hudson.plugins.emailext.plugins.recipients.ListRecipientProvider": "recipients",
+                "hudson.plugins.emailext.plugins.recipients.FailingTestSuspectsRecipientProvider":
+                    "failing-test-suspects-recipients",
+                "hudson.plugins.emailext.plugins.recipients.FirstFailingBuildSuspectsRecipientProvider":
+                    "first-failing-build-suspects-recipients"
+            }
+            trigger_result = {}  # To be able to print all on the output yaml
+            for key in trigger_dict.keys():
+                trigger_result[key] = False
+            # JJB implementation only uses the default content-type/subject/message
+            # and uses those in the trigger elements. Does not take information
+            # from trigger element's content. This means that JJW can do the conversion
+            # only if triggers use the defaults for subject and body. However, `sendTo`
+            # must be taken from one of the triggers, in this case, first trigger will
+            # be used in order to retrieve sendTo information. This also means that,
+            # `sendTo` must be same in all triggers. If there are different triggers,
+            # NotImplementedError will be raised to make sure JJW does not cause
+            # information loss.
+            for trigger in element:
+                if "send-to" not in ext_email:
+                    ext_email = __process_email(trigger, ext_email, provider_dict)
+                else:
+                    __compare_triggers_and_process_email(trigger, ext_email, provider_dict)
+                tag = trigger.tag.split(trigger_prefix)[1]
+                if tag in trigger_dict.keys():
+                    trigger_result[tag] = True
+                else:
+                    raise NotImplementedError("Email-ext trigger %s is not implemented." % trigger.tag)
+            for key, value in trigger_result.items():
+                ext_email[trigger_dict[key]] = value
+        elif element.tag == 'matrixTriggerMode':
+            matrix_dict = {
+                "BOTH": "both",
+                "ONLY_CONFIGURATIONS": "only-configurations",
+                "ONLY_PARENT": "only-parent"
+            }
+            if element.text in matrix_dict.keys():
+                ext_email['matrix-trigger'] = matrix_dict[element.text]
+            else:
+                raise NotImplementedError("Matrix trigger mode %s is not implemented." % element.text)
         else:
             raise NotImplementedError("cannot handle XML %s" % element.tag)
 

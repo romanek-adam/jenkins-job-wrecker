@@ -1,0 +1,50 @@
+
+<hudson.plugins.emailext.ExtendedEmailPublisher>
+  <recipientList>foo@example.com, bar@example.com</recipientList>
+  <from>lorem@ipsum.dolor</from>
+  <configuredTriggers>
+    <hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+      <email>
+        <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+        <body>$PROJECT_DEFAULT_CONTENT</body>
+        <recipientProviders>
+          <hudson.plugins.emailext.plugins.recipients.UpstreamComitterRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.RequesterRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.CulpritsRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.ListRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.FailingTestSuspectsRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.FirstFailingBuildSuspectsRecipientProvider/>
+        </recipientProviders>
+      </email>
+    </hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+    <hudson.plugins.emailext.plugins.trigger.UnstableTrigger>
+      <email>
+        <subject>$PROJECT_NOT_DEFAULT_SUBJECT</subject>
+        <body>$PROJECT_NOT_DEFAULT_CONTENT</body>
+        <recipientProviders>
+          <hudson.plugins.emailext.plugins.recipients.UpstreamComitterRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.RequesterRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.CulpritsRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.ListRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.FailingTestSuspectsRecipientProvider/>
+          <hudson.plugins.emailext.plugins.recipients.FirstFailingBuildSuspectsRecipientProvider/>
+        </recipientProviders>
+      </email>
+    </hudson.plugins.emailext.plugins.trigger.UnstableTrigger>
+  </configuredTriggers>
+  <contentType>text/html</contentType>
+  <defaultSubject>Subject for Build ${BUILD_NUMBER}</defaultSubject>
+  <defaultContent>The build has finished</defaultContent>
+  <attachmentsPattern>*/foo*.log</attachmentsPattern>
+  <presendScript>cancel=true</presendScript>
+  <postsendScript>cancel=true</postsendScript>
+  <attachBuildLog>false</attachBuildLog>
+  <compressBuildLog>false</compressBuildLog>
+  <saveOutput>true</saveOutput>
+  <disabled>false</disabled>
+  <replyTo>foo@example.com</replyTo>
+  <matrixTriggerMode>ONLY_CONFIGURATIONS</matrixTriggerMode>
+</hudson.plugins.emailext.ExtendedEmailPublisher>
+
