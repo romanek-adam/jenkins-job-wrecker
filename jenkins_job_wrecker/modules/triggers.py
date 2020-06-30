@@ -256,6 +256,22 @@ def ghprbtrigger(top, parent):
             ghpr['permit-all'] = get_bool(child.text)
         elif child.tag == 'autoCloseFailedPullRequests':
             ghpr['auto-close-on-fail'] = get_bool(child.text)
+        elif child.tag == 'blackListCommitAuthor':
+            ghpr['black-list-commit-author'] = child.text.strip().split(' ')
+        elif child.tag == 'blackListLabels':
+            ghpr['black-list-labels'] = child.text.strip().split('\n')
+        elif child.tag == 'blackListTargetBranches':
+            ghpr['black-list-target-branches'] = [item[0].text for item in child]
+        elif child.tag == 'displayBuildErrorsOnDownstreamBuilds':
+            ghpr['display-build-errors-on-downstream-builds'] = get_bool(child.text)
+        elif child.tag == 'excludedRegions':
+            ghpr['excluded-regions'] = child.text.strip().split('\n')
+        elif child.tag == 'includedRegions':
+            ghpr['included-regions'] = child.text.strip().split('\n')
+        elif child.tag == 'skipBuildPhrase':
+            ghpr['skip-build-phrase'] = child.text
+        elif child.tag == 'whiteListLabels':
+            ghpr['white-list-labels'] = child.text.strip().split('\n')
         elif child.tag == 'whiteListTargetBranches':
             ghpr['white-list-target-branches'] = []
             for branch in child:
@@ -263,5 +279,58 @@ def ghprbtrigger(top, parent):
                     ghpr['white-list-target-branches'].append(branch[0].text.strip())
         elif child.tag == 'gitHubAuthId':
             ghpr['auth-id'] = child.text
-
+        elif child.tag == 'extensions':
+            extensions_prefix = "org.jenkinsci.plugins.ghprb.extensions."
+            for extension in child:
+                if extension.tag == extensions_prefix+"status.GhprbSimpleStatus":
+                    for extension_child in extension:
+                        if extension_child.tag == "commitStatusContext":
+                            ghpr['status-context'] = extension_child.text
+                        elif extension_child.tag == "triggeredStatus":
+                            ghpr['triggered-status'] = extension_child.text
+                        elif extension_child.tag == "startedStatus":
+                            ghpr['started-status'] = extension_child.text
+                        elif extension_child.tag == "statusUrl":
+                            ghpr['status-url'] = extension_child.text
+                        elif extension_child.tag == "addTestResults":
+                            ghpr['status-add-test-results'] = extension_child.text
+                        elif extension_child.tag == "completedStatus":
+                            for status in extension_child:
+                                if status[1].text == "SUCCESS":
+                                    ghpr['success-status'] = status[0].text
+                                elif status[1].text == "FAILURE":
+                                    ghpr['failure-status'] = status[0].text
+                                elif status[1].text == "ERROR":
+                                    ghpr['error-status'] = status[0].text
+                                else:
+                                    raise NotImplementedError("GHPRB status %s is not implemented."
+                                                              % status[1].text)
+                        else:
+                            raise NotImplementedError("GHPRB simple status type %s is not implemented."
+                                                      % extension_child.tag)
+                elif extension.tag == extensions_prefix+"comments.GhprbBuildStatus":
+                    for extension_child in extension:
+                        if extension_child.tag == "messages":
+                            for message in extension_child:
+                                if message[1].text == "SUCCESS":
+                                    ghpr['success-comment'] = message[0].text
+                                elif message[1].text == "FAILURE":
+                                    ghpr['failure-comment'] = message[0].text
+                                elif message[1].text == "ERROR":
+                                    ghpr['error-comment'] = message[0].text
+                                else:
+                                    raise NotImplementedError("GHPRB message %s is not implemented." % message[0].text)
+                        else:
+                            raise NotImplementedError("GHPRB extension type %s is not implemented."
+                                                      % extension_child.tag)
+                elif extension.tag == extensions_prefix+"build.GhprbCancelBuildsOnUpdate":
+                    ghpr['cancel-builds-on-update'] = True
+                elif extension.tag == extensions_prefix+"comments.GhprbCommentFile":
+                    ghpr['comment-file'] = extension[0].text
+                elif extension.tag == extensions_prefix+"status.GhprbNoCommitStatus":
+                    ghpr['no-commit-status'] = True
+                else:
+                    raise NotImplementedError("GHPRB extension %s is not implemented." % extension.tag)
+        else:
+            raise NotImplementedError("GHPRB tag %s is not implemented." % child.tag)
     parent.append({'github-pull-request': ghpr})
