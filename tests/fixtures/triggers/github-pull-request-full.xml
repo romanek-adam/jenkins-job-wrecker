@@ -51,7 +51,7 @@ region</includedRegions>
           <triggeredStatus>triggered status message</triggeredStatus>
           <startedStatus>started</startedStatus>
           <statusUrl>url/to/status</statusUrl>
-          <addTestResults>test result with status message</addTestResults>
+          <addTestResults>true</addTestResults>
           <completedStatus>
             <org.jenkinsci.plugins.ghprb.extensions.comments.GhprbBuildResultMessage>
               <message>success message</message>

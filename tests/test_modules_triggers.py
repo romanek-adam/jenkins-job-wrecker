@@ -16,3 +16,6 @@ class TestGerritTrigger(object):
 class TestGithubPullRequest(object):
     def test_github_pull_request_builder(self):
         compare_jjb_output(fixtures_path, "github-pull-request-full", "github-pull-request-full")
+
+    def test_github_pull_request_builder_002(self):
+        compare_jjb_output(fixtures_path, "github-pull-request-002", "github-pull-request-002")
