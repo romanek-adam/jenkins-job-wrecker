@@ -43,7 +43,7 @@
           triggered-status: "triggered status message"
           started-status: "started"
           status-url: "url/to/status"
-          status-add-test-results: "test result with status message"
+          status-add-test-results: true
           success-status: "success message"
           failure-status: "failure message"
           error-status: "error message"

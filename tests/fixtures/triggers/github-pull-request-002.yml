@@ -1,0 +1,31 @@
+- job:
+    name: github-pull-request-002
+    project-type: freestyle
+    triggers:
+    - github-pull-request:
+        admin-list: []
+        allow-whitelist-orgs-as-admins: false
+        auth-id: null
+        auto-close-on-fail: false
+        black-list-commit-author: []
+        black-list-labels: []
+        black-list-target-branches: []
+        build-desc-template: null
+        cron: null
+        display-build-errors-on-downstream-builds: false
+        excluded-regions: []
+        github-hooks: true
+        included-regions: []
+        only-trigger-phrase: false
+        org-list: []
+        permit-all: true
+        skip-build-phrase: null
+        started-status: null
+        status-add-test-results: false
+        status-context: null
+        status-url: null
+        trigger-phrase: null
+        triggered-status: null
+        white-list: []
+        white-list-labels: []
+        white-list-target-branches: []

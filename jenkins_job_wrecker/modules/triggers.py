@@ -250,14 +250,25 @@ def ghprbtrigger(top, parent):
     for child in top:
         if child.tag == 'spec' or child.tag == 'cron':
             ghpr['cron'] = child.text
-        elif child.tag == 'adminlist' and child.text:
-            ghpr['admin-list'] = child.text.strip().split('\n')
+        elif child.tag == 'configVersion':
+            pass  # Not needed
+        elif child.tag == 'adminlist':
+            if child.text:
+                ghpr['admin-list'] = child.text.strip().split('\n')
+            else:
+                ghpr['admin-list'] = []
         elif child.tag == 'allowMembersOfWhitelistedOrgsAsAdmin':
             ghpr['allow-whitelist-orgs-as-admins'] = get_bool(child.text)
-        elif child.tag == 'whitelist' and child.text is not None:
-            ghpr['white-list'] = child.text.strip().split('\n')
-        elif child.tag == 'orgslist' and child.text is not None:
-            ghpr['org-list'] = child.text.strip().split('\n')
+        elif child.tag == 'whitelist':
+            if child.text:
+                ghpr['white-list'] = child.text.strip().split('\n')
+            else:
+                ghpr['white-list'] = []
+        elif child.tag == 'orgslist':
+            if child.text:
+                ghpr['org-list'] = child.text.strip().split('\n')
+            else:
+                ghpr['org-list'] = []
         elif child.tag == 'buildDescTemplate':
             ghpr['build-desc-template'] = child.text
         elif child.tag == 'triggerPhrase':
@@ -271,26 +282,38 @@ def ghprbtrigger(top, parent):
         elif child.tag == 'autoCloseFailedPullRequests':
             ghpr['auto-close-on-fail'] = get_bool(child.text)
         elif child.tag == 'blackListCommitAuthor':
-            ghpr['black-list-commit-author'] = child.text.strip().split(' ')
+            if child.text:
+                ghpr['black-list-commit-author'] = child.text.strip().split(' ')
+            else:
+                ghpr['black-list-commit-author'] = []
         elif child.tag == 'blackListLabels':
-            ghpr['black-list-labels'] = child.text.strip().split('\n')
+            if child.text:
+                ghpr['black-list-labels'] = child.text.strip().split('\n')
+            else:
+                ghpr['black-list-labels'] = []
         elif child.tag == 'blackListTargetBranches':
-            ghpr['black-list-target-branches'] = [item[0].text for item in child]
+            ghpr['black-list-target-branches'] = [item[0].text.strip() for item in child if item[0].text is not None]
         elif child.tag == 'displayBuildErrorsOnDownstreamBuilds':
             ghpr['display-build-errors-on-downstream-builds'] = get_bool(child.text)
         elif child.tag == 'excludedRegions':
-            ghpr['excluded-regions'] = child.text.strip().split('\n')
+            if child.text:
+                ghpr['excluded-regions'] = child.text.strip().split('\n')
+            else:
+                ghpr['excluded-regions'] = []
         elif child.tag == 'includedRegions':
-            ghpr['included-regions'] = child.text.strip().split('\n')
+            if child.text:
+                ghpr['included-regions'] = child.text.strip().split('\n')
+            else:
+                ghpr['included-regions'] = []
         elif child.tag == 'skipBuildPhrase':
             ghpr['skip-build-phrase'] = child.text
         elif child.tag == 'whiteListLabels':
-            ghpr['white-list-labels'] = child.text.strip().split('\n')
+            if child.text:
+                ghpr['white-list-labels'] = child.text.strip().split('\n')
+            else:
+                ghpr['white-list-labels'] = []
         elif child.tag == 'whiteListTargetBranches':
-            ghpr['white-list-target-branches'] = []
-            for branch in child:
-                if branch[0].text is not None:
-                    ghpr['white-list-target-branches'].append(branch[0].text.strip())
+            ghpr['white-list-target-branches'] = [item[0].text.strip() for item in child if item[0].text is not None]
         elif child.tag == 'gitHubAuthId':
             ghpr['auth-id'] = child.text
         elif child.tag == 'extensions':
@@ -307,7 +330,7 @@ def ghprbtrigger(top, parent):
                         elif extension_child.tag == "statusUrl":
                             ghpr['status-url'] = extension_child.text
                         elif extension_child.tag == "addTestResults":
-                            ghpr['status-add-test-results'] = extension_child.text
+                            ghpr['status-add-test-results'] = get_bool(extension_child.text)
                         elif extension_child.tag == "completedStatus":
                             for status in extension_child:
                                 if status[1].text == "SUCCESS":
