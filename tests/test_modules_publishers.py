@@ -2,6 +2,7 @@
 from jenkins_job_wrecker.cli import get_xml_root
 from jenkins_job_wrecker.modules.publishers import groovypostbuildrecorder
 import os
+from .helpers import compare_jjb_output
 
 fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'publishers')
 
@@ -20,3 +21,7 @@ class TestGroovyPostbuildPlugin(object):
         assert jjb_groovy_postbuild['on-failure'] == 'nothing'
         assert jjb_groovy_postbuild['sandbox'] is False
         assert jjb_groovy_postbuild['script'] == 'foo bar'
+
+class TestWorkspaceCleanupPublisherPlugin(object):
+    def test_cleanup_workspace(self):
+        compare_jjb_output(fixtures_path, "workspace-cleanup", "workspace-cleanup")

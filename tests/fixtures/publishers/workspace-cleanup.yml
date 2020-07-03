@@ -1,0 +1,20 @@
+- job:
+    name: workspace-cleanup
+    project-type: freestyle
+    publishers:
+    - workspace-cleanup:
+        clean-if:
+        - success: true
+        - unstable: true
+        - failure: true
+        - not-built: true
+        - aborted: true
+        clean-parent: false
+        dirmatch: true
+        exclude:
+        - pattern_to_exclude
+        fail-build: false
+        include:
+        - pattern_to_include
+        disable-deferred-wipeout: true
+        external-deletion-command: 'print("del_cmd")'
