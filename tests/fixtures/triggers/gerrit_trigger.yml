@@ -13,6 +13,7 @@
         escape-quotes: true
         failure-message: Build Failure
         failure-message-file: Build unsuccessful
+        override-votes: true
         gerrit-build-failed-codereview-value: -1
         gerrit-build-failed-verified-value: -1
         gerrit-build-notbuilt-codereview-value: 0
@@ -84,3 +85,4 @@
         unstable-message: Build Unstable
     - gerrit:
         notification-level: SERVER_DEFAULT
+        override-votes: false
