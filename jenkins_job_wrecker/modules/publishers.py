@@ -361,4 +361,8 @@ def wscleanup(top, parent):
             cleanup['fail-build'] = not get_bool(cleanupel.text)
         elif cleanupel.tag == 'cleanupMatrixParent':
             cleanup['clean-parent'] = get_bool(cleanupel.text)
+        elif cleanupel.tag == 'disableDeferredWipeout':
+            cleanup['disable-deferred-wipeout'] = get_bool(cleanupel.text)
+        elif cleanupel.tag == 'externalDelete':
+            cleanup['external-deletion-command'] = cleanupel.text
     parent.append({'workspace-cleanup': cleanup})
