@@ -174,16 +174,6 @@ def __gerrit_process_trigger_on_events(child):
 
 def gerrittrigger(top, parent):
     mapper = Mapper({
-        "gerritBuildStartedVerifiedValue": ("gerrit-build-started-verified-value", int),
-        "gerritBuildStartedCodeReviewValue": ("gerrit-build-started-codereview-value", int),
-        "gerritBuildSuccessfulVerifiedValue": ("gerrit-build-successful-verified-value", int),
-        "gerritBuildSuccessfulCodeReviewValue": ("gerrit-build-successful-codereview-value", int),
-        "gerritBuildFailedVerifiedValue": ("gerrit-build-failed-verified-value", int),
-        "gerritBuildFailedCodeReviewValue": ("gerrit-build-failed-codereview-value", int),
-        "gerritBuildUnstableVerifiedValue": ("gerrit-build-unstable-verified-value", int),
-        "gerritBuildUnstableCodeReviewValue": ("gerrit-build-unstable-codereview-value", int),
-        "gerritBuildNotBuiltVerifiedValue": ("gerrit-build-notbuilt-verified-value", int),
-        "gerritBuildNotBuiltCodeReviewValue": ("gerrit-build-notbuilt-codereview-value", int),
         "silentMode": ("silent", bool),
         "silentStartMode": ("silent-start", bool),
         "escapeQuotes": ("escape-quotes", bool),
@@ -203,10 +193,28 @@ def gerrittrigger(top, parent):
         "dynamicTriggerConfiguration": ("dynamic-trigger-enabled", bool),
         "triggerConfigURL": ("dynamic-trigger-url", str),
     })
+    mapper_gerrit_build = Mapper({
+        "gerritBuildStartedVerifiedValue": ("gerrit-build-started-verified-value", int),
+        "gerritBuildStartedCodeReviewValue": ("gerrit-build-started-codereview-value", int),
+        "gerritBuildSuccessfulVerifiedValue": ("gerrit-build-successful-verified-value", int),
+        "gerritBuildSuccessfulCodeReviewValue": ("gerrit-build-successful-codereview-value", int),
+        "gerritBuildFailedVerifiedValue": ("gerrit-build-failed-verified-value", int),
+        "gerritBuildFailedCodeReviewValue": ("gerrit-build-failed-codereview-value", int),
+        "gerritBuildUnstableVerifiedValue": ("gerrit-build-unstable-verified-value", int),
+        "gerritBuildUnstableCodeReviewValue": ("gerrit-build-unstable-codereview-value", int),
+        "gerritBuildNotBuiltVerifiedValue": ("gerrit-build-notbuilt-verified-value", int),
+        "gerritBuildNotBuiltCodeReviewValue": ("gerrit-build-notbuilt-codereview-value", int)
+    })
     gerrit_trigger = {}
+    is_override_votes = False
     for child in top:
         if mapper.map_element(child, gerrit_trigger):
             pass  # Handled by the mapper.
+        elif mapper_gerrit_build.map_element(child, gerrit_trigger):
+            # Jenkins Job Builder implementation uses "override-votes"
+            # key to override default vote values. For detail:
+            # https://docs.openstack.org/infra/jenkins-job-builder/triggers.html#triggers.gerrit
+            is_override_votes = True
         elif child.tag == "gerritProjects":
             gerrit_trigger["projects"] = __gerrit_process_gerrit_projects(child)
         elif child.tag == "dynamicGerritProjects":
@@ -238,6 +246,8 @@ def gerrittrigger(top, parent):
             pass  # Unconfigurable Attribute
         else:
             raise NotImplementedError("Not implemented Gerrit Trigger Plugin's attribute: ", child.tag)
+
+    gerrit_trigger["override-votes"] = is_override_votes
     parent.append({'gerrit': gerrit_trigger})
 
 
