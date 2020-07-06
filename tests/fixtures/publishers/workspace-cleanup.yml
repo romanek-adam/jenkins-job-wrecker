@@ -18,3 +18,8 @@
         - pattern_to_include
         disable-deferred-wipeout: true
         external-deletion-command: 'print("del_cmd")'
+    - workspace-cleanup:
+        clean-if: []
+        exclude: []
+        external-deletion-command: ''
+        include: []

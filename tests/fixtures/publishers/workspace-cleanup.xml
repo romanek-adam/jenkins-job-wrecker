@@ -24,5 +24,8 @@
       <externalDelete>print(&quot;del_cmd&quot;)</externalDelete>
       <disableDeferredWipeout>true</disableDeferredWipeout>
     </hudson.plugins.ws__cleanup.WsCleanup>
+    <hudson.plugins.ws__cleanup.WsCleanup plugin="ws-cleanup@0.37">
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.WsCleanup>
   </publishers>
 </project>
