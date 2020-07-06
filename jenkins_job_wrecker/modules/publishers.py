@@ -364,5 +364,5 @@ def wscleanup(top, parent):
         elif cleanupel.tag == 'disableDeferredWipeout':
             cleanup['disable-deferred-wipeout'] = get_bool(cleanupel.text)
         elif cleanupel.tag == 'externalDelete':
-            cleanup['external-deletion-command'] = cleanupel.text
+            cleanup['external-deletion-command'] = cleanupel.text or ''
     parent.append({'workspace-cleanup': cleanup})
