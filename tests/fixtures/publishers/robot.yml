@@ -1,0 +1,29 @@
+- job:
+    name: robot
+    project-type: freestyle
+    publishers:
+      - robot:
+          output-path: reports/robot
+          log-file-link: report.html
+          report-html: custom-report.html
+          log-html: custom-log.html
+          output-xml: custom-output.xml
+          pass-threshold: 80.0
+          unstable-threshold: 60.0
+          only-critical: false
+          enable-cache: false
+          other-files:
+            - extra-file1.html
+            - extra-file2.txt
+          archive-output-xml: false
+      - robot:
+          archive-output-xml: true
+          enable-cache: true
+          log-html: log.html
+          only-critical: true
+          other-files: []
+          output-path: reports/robot
+          output-xml: output.xml
+          pass-threshold: 0.0
+          report-html: report.html
+          unstable-threshold: 0.0

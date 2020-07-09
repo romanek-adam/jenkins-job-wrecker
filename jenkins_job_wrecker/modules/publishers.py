@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 import jenkins_job_wrecker.modules.base
-from jenkins_job_wrecker.helpers import get_bool
+from jenkins_job_wrecker.helpers import get_bool, Mapper
 
 
 class Publishers(jenkins_job_wrecker.modules.base.Base):
@@ -253,6 +253,31 @@ def groovypostbuildrecorder(top, parent):
         else:
             raise NotImplementedError("cannot handle groovy-postbuild elements")
     parent.append({'groovy-postbuild': groovy})
+
+
+def robotpublisher(top, parent):
+    robot = {}
+    mapper_robot_publisher = Mapper({
+        "outputPath": ("output-path", str),
+        "logFileLink": ("log-file-link", str),
+        "reportFileName": ("report-html", str),
+        "logFileName": ("log-html", str),
+        "outputFileName": ("output-xml", str),
+        "passThreshold": ("pass-threshold", float),
+        "unstableThreshold": ("unstable-threshold", float),
+        "onlyCritical": ("only-critical", bool),
+        "enableCache": ("enable-cache", bool)
+    })
+    for child in top:
+        if mapper_robot_publisher.map_element(child, robot):
+            pass  # Handled by the mapper.
+        elif child.tag == "disableArchiveOutput":
+            robot["archive-output-xml"] = not get_bool(child.text)
+        elif child.tag == "otherFiles":
+            robot["other-files"] = [item.text for item in child if item.tag == "string"]
+        else:
+            raise NotImplementedError("Robot Publisher tag: %s not implemented." % child.tag)
+    parent.append({'robot': robot})
 
 
 def slacknotifier(top, parent):
