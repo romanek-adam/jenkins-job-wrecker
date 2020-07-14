@@ -27,3 +27,13 @@ class TestCombinationFilter(object):
         dct = yaml.safe_load(yml)
         assert len(dct) == 1
         assert dct[0]['job']['execution-strategy']['combination-filter'] == "(lorem == ipsum)"
+
+class TestConcurrentBuild(object):
+    def test_basic(self):
+        filename = os.path.join(fixtures_path, 'concurrent-build.xml')
+        root = get_xml_root(filename=filename)
+        jobname = "test"
+        yml = root_to_yaml(root, jobname)
+        dct = yaml.safe_load(yml)
+        assert len(dct) == 1
+        assert dct[0]['job']['concurrent'] == False
