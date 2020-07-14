@@ -290,3 +290,11 @@ def rebuildsettings(top, parent):
         else:
             raise NotImplementedError('Unsupported tag')
     parent.append({'rebuild': rebuild})
+
+
+def naginatoroptoutproperty(top, parent):
+    for child in top:
+        if child.tag == "optOut":
+            parent.append({'naginator-opt-out': get_bool(child.text)})
+        else:
+            raise NotImplementedError('Naginator Opt Out tag %s has not been implemented.' % child.tag)
