@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from jenkins_job_wrecker.cli import get_xml_root
-from jenkins_job_wrecker.modules.properties import authorizationmatrixproperty, buildblockerproperty, rebuildsettings
+from jenkins_job_wrecker.modules.properties import authorizationmatrixproperty, buildblockerproperty, rebuildsettings, \
+    parameters
 import os
 
 fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'properties')
@@ -67,3 +68,22 @@ class TestRebuildSettings(object):
         assert len(rebuild) == 2
         assert rebuild["auto-rebuild"] is False
         assert rebuild["rebuild-disabled"] is False
+
+class TestParameters(object):
+    def test_parameter_separator(self):
+        filename = os.path.join(fixtures_path, 'param-separator.xml')
+        root = get_xml_root(filename=filename)
+        assert root is not None
+        parent = []
+        parameters(root, parent)
+        assert len(parent) == 2
+        parameter_separator = parent[0]["parameter-separator"]
+        assert parameter_separator["name"] == 'separator-12345-a12b-1234-2345-abcde123123'
+        assert parameter_separator["section-header"] == 'MISCELLANEOUS'
+        assert parameter_separator["section-header-style"] == 'font-weight:bold;margin-bottom:20px;'
+        assert parameter_separator["separator-style"] == 'margin-top:20px;'
+        parameter_separator = parent[1]["parameter-separator"]
+        assert parameter_separator["name"] == ''
+        assert parameter_separator["section-header"] == 'MISCELLANEOUS'
+        assert parameter_separator["section-header-style"] == 'font-weight:bold;margin-bottom:20px;'
+        assert parameter_separator["separator-style"] == 'margin-top:20px;'
