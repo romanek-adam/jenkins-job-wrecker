@@ -18,6 +18,7 @@ class TestChildCustomWorkspace(object):
         assert parent[0][0] == "child-workspace"
         assert parent[0][1] == "lorem"
 
+
 class TestCombinationFilter(object):
     def test_basic(self):
         filename = os.path.join(fixtures_path, 'combination-filter.xml')
@@ -28,8 +29,9 @@ class TestCombinationFilter(object):
         assert len(dct) == 1
         assert dct[0]['job']['execution-strategy']['combination-filter'] == "(lorem == ipsum)"
 
+
 class TestConcurrentBuild(object):
-    def test_basic(self):
+    def test_concurrency_false(self):
         filename = os.path.join(fixtures_path, 'concurrent-build.xml')
         root = get_xml_root(filename=filename)
         jobname = "test"
@@ -37,3 +39,21 @@ class TestConcurrentBuild(object):
         dct = yaml.safe_load(yml)
         assert len(dct) == 1
         assert dct[0]['job']['concurrent'] == False
+
+    def test_concurrency_true(object):
+        filename = os.path.join(fixtures_path, 'concurrent-build-02.xml')
+        root = get_xml_root(filename=filename)
+        jobname = "test"
+        yml = root_to_yaml(root, jobname)
+        dct = yaml.safe_load(yml)
+        assert len(dct) == 1
+        assert dct[0]['job']['concurrent'] == True
+
+    def test_concurrency_without_properties(object):
+        filename = os.path.join(fixtures_path, 'concurrent-build-03.xml')
+        root = get_xml_root(filename=filename)
+        jobname = "test"
+        yml = root_to_yaml(root, jobname)
+        dct = yaml.safe_load(yml)
+        assert len(dct) == 1
+        assert dct[0]['job']['concurrent'] == True
