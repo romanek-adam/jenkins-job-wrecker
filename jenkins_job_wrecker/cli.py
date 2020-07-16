@@ -89,12 +89,13 @@ def root_to_yaml(root, name, ignore_actions=False):
             disable_concurrent_tag = \
                 "org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty"
             properties_element = root.find('properties')
-            if properties_element:
-                if properties_element.find(disable_concurrent_tag):
-                    ET.SubElement(root, 'concurrentBuild').text = 'true'
-                else:
+            if properties_element is not None:
+                if properties_element.find(disable_concurrent_tag) is not None:
                     ET.SubElement(root, 'concurrentBuild').text = 'false'
-
+                else:
+                    ET.SubElement(root, 'concurrentBuild').text = 'true'
+            else:
+                ET.SubElement(root, 'concurrentBuild').text = 'true'
         # Handle each top-level XML element with custom modules/functions in
         # modules/handlers.py
         # registry determines difference at runtime
