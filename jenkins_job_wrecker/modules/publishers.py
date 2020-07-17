@@ -131,15 +131,20 @@ def buildtrigger(top, parent):
         if element.tag == 'configs':
             build_triggers = []
             for sub in element:
-                project = {}
+                project = {
+                    "current-parameters": False,
+                    "node-parameters": False
+                }
                 for config in sub:
                     if config.tag == 'projects':
-                        project['project'] = config.text
+                        project['project'] = [x.strip() for x in config.text.split(',')]
                     elif (config.tag == 'condition' and
                           config.text in ['SUCCESS', 'UNSTABLE', 'FAILED_OR_BETTER',
                                           'UNSTABLE_OR_BETTER', 'UNSTABLE_OR_WORSE',
                                           'FAILED', 'ALWAYS']):
                         project['condition'] = config.text
+                    elif config.tag == 'triggerFromChildProjects':
+                        project['trigger-from-child-projects'] = get_bool(config.text)
                     elif config.tag == 'triggerWithNoParameters':
                         project['trigger-with-no-params'] = \
                             (config.text == 'true')
@@ -148,10 +153,91 @@ def buildtrigger(top, parent):
                             if subconf.tag == 'hudson.plugins.parameterizedtrigger.PredefinedBuildParameters':
                                 for bottom in subconf:
                                     if bottom.tag == 'properties':
-                                        project['predefined-paramters'] = bottom.text
+                                        project['predefined-parameters'] = bottom.text
+                                    else:
+                                        raise NotImplementedError("cannot handle PredefinedBuildParameters "
+                                                                  "sub-element %s " % bottom.tag)
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.FileBuildParameters':
+                                for parameter in subconf:
+                                    if parameter.tag == "propertiesFile":
+                                        project["property-file"] = parameter.text
+                                    elif parameter.tag == "failTriggerOnMissing":
+                                        project["fail-on-missing"] = get_bool(parameter.text)
+                                    elif parameter.tag == "textParamValueOnNewLine":
+                                        project["property-multiline"] = get_bool(parameter.text)
+                                    elif parameter.tag == "useMatrixChild":
+                                        project["use-matrix-child-files"] = get_bool(parameter.text)
+                                    elif parameter.tag == "onlyExactRuns":
+                                        project["only-exact-matrix-child-runs"] = get_bool(parameter.text)
+                                    elif parameter.tag == "encoding":
+                                        project["file-encoding"] = parameter.text
+                                    else:
+                                        raise NotImplementedError("cannot handle FileBuildParameters sub-element %s"
+                                                                  % parameter.tag)
+                            elif subconf.tag == 'hudson.plugins.git.GitRevisionBuildParameters':
+                                git_revision = {}
+                                for parameter in subconf:
+                                    if parameter.tag == "combineQueuedCommits":
+                                        git_revision["combine-queued-commits"] = get_bool(parameter.text)
+                                    else:
+                                        raise NotImplementedError("cannot handle GitRevisionBuildParameters "
+                                                                  "sub-element %s " % parameter.tag)
+                                project["git-revision"] = git_revision
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.matrix.MatrixSubsetBuildParameters':
+                                for parameter in subconf:
+                                    if parameter.tag == "filter":
+                                        project["restrict-matrix-project"] = parameter.text
+                                    else:
+                                        raise NotImplementedError("cannot handle MatrixSubsetBuildParameters "
+                                                                  "sub-element %s " % parameter.tag)
+                            elif subconf.tag == 'org.jvnet.jenkins.plugins.nodelabelparameter.parameterizedtrigger.NodeLabelBuildParameter':
+                                for element in subconf:
+                                    if element.tag == "name":
+                                        project["node-label-name"] = element.text
+                                    elif element.tag == "nodeLabel":
+                                        project["node-label"] = element.text
+                                    else:
+                                        raise NotImplementedError("cannot handle NodeLabelBuildParameter "
+                                                                  "sub-element %s " % element.tag)
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.CurrentBuildParameters':
+                                project["current-parameters"] = True
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.NodeParameters':
+                                project["node-parameters"] = True
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.SubversionRevisionBuildParameters':
+                                project["svn-revision"] = True
+                                for element in subconf:
+                                    if element.tag == 'includeUpstreamParameters':
+                                        project["include-upstream"] = get_bool(element.text)
+                                    else:
+                                        raise NotImplementedError("cannot handle SubversionRevisionBuildParameters "
+                                                                  "sub-element %s " % element.tag)
+                            elif subconf.tag == 'hudson.plugins.parameterizedtrigger.BooleanParameters':
+                                for config in subconf:
+                                    if config.tag == "configs":
+                                        boolean_config = {}
+                                        for bool_param_config in config:
+                                            if bool_param_config.tag == \
+                                                    "hudson.plugins.parameterizedtrigger.BooleanParameterConfig":
+                                                if len(bool_param_config) == 2 and bool_param_config[0].tag == "name" \
+                                                        and bool_param_config[1].tag == "value":
+                                                    boolean_config[bool_param_config[0].text] = \
+                                                        get_bool(bool_param_config[1].text)
+                                                else:
+                                                    raise NotImplementedError("cannot handle BooleanParameters"
+                                                                          "sub-element %s " % bool_param_config.tag)
+                                            else:
+                                                raise NotImplementedError("cannot handle BooleanParameters.configs"
+                                                                          "sub-element %s " % bool_param_config.tag)
+                                        project["boolean-parameters"] = boolean_config
+                                    else:
+                                        raise NotImplementedError("cannot handle BooleanParameters"
+                                                                  "sub-element %s " % config.tag)
+                            else:
+                                raise NotImplementedError("cannot handle subconfig XML %s" % subconf.tag)
                     else:
                         raise NotImplementedError("cannot handle "
                                                   "XML %s" % config.tag)
+
                 build_triggers.append(project)
 
             parent.append({'trigger-parameterized-builds': build_triggers})

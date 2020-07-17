@@ -1,0 +1,89 @@
+- job:
+    name: trigger-parameterized-builds
+    project-type: freestyle
+    publishers:
+      - trigger-parameterized-builds:
+        - condition: ALWAYS # Test with predefined parameters
+          current-parameters: false
+          node-parameters: false
+          project:
+            - other_job
+            - foo
+            - bar
+          predefined-parameters: |
+            foo=bar
+            bar=foo
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+        # Test with predefined parameters, Parameters from properties file parameters
+        - condition: ALWAYS
+          current-parameters: false
+          node-parameters: false
+          project:
+            - other_job1
+            - other_job2
+          predefined-parameters: BUILD_NUM=${BUILD_NUMBER}
+          git-revision: # To pass-through Git Commit that was built
+            combine-queued-commits: false # To disable combineQueuedCommits under GitRevisionBuildParameters
+          property-file: version.prop
+          fail-on-missing: true
+          property-multiline: false
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+          use-matrix-child-files: true
+          only-exact-matrix-child-runs: false
+        - condition: ALWAYS # Test with predefined parameters, disabled pass-through git commit, restrict matrix params
+          current-parameters: false
+          node-parameters: false
+          project:
+            - yet_another_job
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+          predefined-parameters: foo=bar
+          git-revision:
+            combine-queued-commits: true
+          restrict-matrix-project: label=="x86" # To restrict matrix execution to a subset
+        - condition: ALWAYS # Test with NodeLabel Name parameter
+          current-parameters: false
+          node-parameters: false
+          project:
+            - yet_another_job_2
+          node-label-name: foo
+          node-label: null
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+        - condition: ALWAYS # Test with NodeLabel parameter without NodeLabel Name
+          current-parameters: false
+          node-parameters: false
+          project:
+            - yet_another_job_3
+          node-label: node-label-foo || node-label-bar
+          node-label-name: null
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+        - condition: ALWAYS # Test with Current build parameters and Build on the same node parameters
+          project:
+            - 'test-project-same-node'
+          node-parameters: true
+          current-parameters: true
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
+        - condition: ALWAYS # Test with boolean parameters and svn-revision
+          boolean-parameters:
+            p1: true
+            p2: false
+          current-parameters: false
+          fail-on-missing: false
+          file-encoding: UTF-8
+          git-revision:
+            combine-queued-commits: true
+          include-upstream: true
+          node-parameters: false
+          project:
+            - other_job
+            - foo
+            - bar
+          property-file: version.prop
+          svn-revision: true
+          trigger-from-child-projects: false
+          trigger-with-no-params: false
