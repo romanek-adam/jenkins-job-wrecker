@@ -8,6 +8,7 @@ PARAMETER_MAPPER = {
     'booleanparameterdefinition': 'bool',
     'choiceparameterdefinition': 'choice',
     'textparameterdefinition': 'text',
+    'passwordparameterdefinition': 'password',
     'fileparameterdefinition': 'file',
     'parameterseparatordefinition': 'parameter-separator'
 }
