@@ -22,6 +22,12 @@ class TestGroovyPostbuildPlugin(object):
         assert jjb_groovy_postbuild['sandbox'] is False
         assert jjb_groovy_postbuild['script'] == 'foo bar'
 
+
 class TestWorkspaceCleanupPublisherPlugin(object):
     def test_cleanup_workspace(self):
         compare_jjb_output(fixtures_path, "workspace-cleanup", "workspace-cleanup")
+
+
+class TestRobotPublisherPlugin(object):
+    def test_robot_publisher(self):
+        compare_jjb_output(fixtures_path, "robot", "robot")

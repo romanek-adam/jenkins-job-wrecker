@@ -33,6 +33,8 @@ class Mapper(object):
             return value
         elif type_ == bool:
             return get_bool(value)
+        elif type_ == float:
+            return float(value)
         else:
             raise ValueError('Unsupported type: {}'.format(type_))
 
