@@ -3,6 +3,7 @@ from jenkins_job_wrecker.cli import get_xml_root
 from jenkins_job_wrecker.modules.properties import authorizationmatrixproperty, buildblockerproperty, rebuildsettings, \
     parameters
 import os
+from .helpers import compare_jjb_output
 
 fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'properties')
 
@@ -69,6 +70,7 @@ class TestRebuildSettings(object):
         assert rebuild["auto-rebuild"] is False
         assert rebuild["rebuild-disabled"] is False
 
+
 class TestParameters(object):
     def test_parameter_separator(self):
         filename = os.path.join(fixtures_path, 'param-separator.xml')
@@ -87,3 +89,8 @@ class TestParameters(object):
         assert parameter_separator["section-header"] == 'MISCELLANEOUS'
         assert parameter_separator["section-header-style"] == 'font-weight:bold;margin-bottom:20px;'
         assert parameter_separator["separator-style"] == 'margin-top:20px;'
+
+
+class TestNaginatorOptOutProperty(object):
+    def test_compare(self):
+        compare_jjb_output(fixtures_path, "naginator-opt-out", "naginator-opt-out")
