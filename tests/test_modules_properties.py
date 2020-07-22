@@ -90,6 +90,18 @@ class TestParameters(object):
         assert parameter_separator["section-header-style"] == 'font-weight:bold;margin-bottom:20px;'
         assert parameter_separator["separator-style"] == 'margin-top:20px;'
 
+    def test_password_parameter(self):
+            filename = os.path.join(fixtures_path, 'password-parameter.xml')
+            root = get_xml_root(filename=filename)
+            assert root is not None
+            parent = []
+            parameters(root, parent)
+            assert len(parent) == 1
+            password_parameter = parent[0]["password"]
+            assert password_parameter["name"] == "SAMPLE_PASSWORD"
+            assert password_parameter["description"] == "sample password, default value should not be changed"
+            assert password_parameter["default"] == "{bG9yZW1faXBzdW1fZG9sb3I=}"
+
 
 class TestNaginatorOptOutProperty(object):
     def test_compare(self):
