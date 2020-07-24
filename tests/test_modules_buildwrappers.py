@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from jenkins_job_wrecker.cli import get_xml_root
 from jenkins_job_wrecker.modules.buildwrappers import prebuildcleanup
+from .helpers import compare_jjb_output
 import os
 
 fixtures_path = os.path.join(os.path.dirname(
@@ -35,3 +36,9 @@ class TestPreBuildCleanup(object):
         assert jjb_ws_cleanup['disable-deferred-wipeout'] is True
         assert 'external-deletion-command' not in jjb_ws_cleanup
         assert 'check-parameter' not in jjb_ws_cleanup
+
+
+
+class TestBuildName(object):
+    def test_build_name(self):
+        compare_jjb_output(fixtures_path, "build-name", "build-name")
