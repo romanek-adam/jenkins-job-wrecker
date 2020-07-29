@@ -1,5 +1,6 @@
 # encoding=utf8
 import jenkins_job_wrecker.modules.base
+from jenkins_job_wrecker.helpers import Mapper
 
 
 class Buildwrappers(jenkins_job_wrecker.modules.base.Base):
@@ -132,7 +133,16 @@ def sshagentbuildwrapper(top, parent):
 
 
 def buildnamesetter(top, parent):
-    parent.append({'build-name': {'name': top[0].text}})
+        build_name = {}
+        build_name_mapper = Mapper({
+            "template": ("name", str),
+            "descriptionTemplate": ("description", str),
+            "runAtStart": ("run-at-start", bool),
+            "runAtEnd": ("run-at-end", bool),
+        })
+        for child in top:
+            build_name_mapper.map_element(child, build_name)
+        parent.append({"build-name": build_name})
 
 
 def timestamperbuildwrapper(top, parent):
