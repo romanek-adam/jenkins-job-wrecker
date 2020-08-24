@@ -50,6 +50,7 @@ def buildtimeoutwrapper(top, parent):
     FAIL = 'hudson.plugins.build__timeout.operations.FailOperation'
     DESC = 'hudson.plugins.build__timeout.operations.WriteDescriptionOperation'
     ABORT = 'hudson.plugins.build__timeout.operations.AbortOperation'
+    ABORT_AND_RESTART = 'hudson.plugins.build__timeout.operations.AbortAndRestartOperation'
     ABSOLUTE = 'hudson.plugins.build_timeout.impl.AbsoluteTimeOutStrategy'
     DEADLINE = 'hudson.plugins.build_timeout.impl.DeadlineTimeOutStrategy'
     ELASTIC = 'hudson.plugins.build_timeout.impl.ElasticTimeOutStrategy'
@@ -101,6 +102,13 @@ def buildtimeoutwrapper(top, parent):
                     description = subelement.find('description')
                     if description is not None:
                         timeout_inject['write-description'] = description.text
+                elif subelement.tag == ABORT_AND_RESTART:
+                    timeout_inject['abort-and-restart'] = True
+                    max_restart = subelement.find('maxRestarts')
+                    if max_restart is not None:
+                        timeout_inject['max-restarts'] = int(max_restart.text)
+                    else:
+                        timeout_inject['max-restarts'] = 0
                 else:
                     raise NotImplementedError("cannot handle "
                                               "XML %s" % subelement.tag)

@@ -38,7 +38,11 @@ class TestPreBuildCleanup(object):
         assert 'check-parameter' not in jjb_ws_cleanup
 
 
-
 class TestBuildName(object):
     def test_build_name(self):
         compare_jjb_output(fixtures_path, "build-name", "build-name")
+
+
+class TestBuildTimeoutWrapper(object):
+    def test_build_name(self):
+        compare_jjb_output(fixtures_path, "build-timeout-wrapper", "build-timeout-wrapper")
