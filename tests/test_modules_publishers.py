@@ -31,3 +31,8 @@ class TestWorkspaceCleanupPublisherPlugin(object):
 class TestRobotPublisherPlugin(object):
     def test_robot_publisher(self):
         compare_jjb_output(fixtures_path, "robot", "robot")
+
+
+class TestTriggerParameterizedBuilds(object):
+    def test_comparison(self):
+        compare_jjb_output(fixtures_path, "trigger-parameterized-builds", "trigger-parameterized-builds")
