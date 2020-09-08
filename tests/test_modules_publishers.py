@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from jenkins_job_wrecker.cli import get_xml_root
 from jenkins_job_wrecker.modules.publishers import groovypostbuildrecorder
+from jenkins_job_wrecker.modules.publishers import extendedemailpublisher
 import os
+import unittest
 from .helpers import compare_jjb_output
 
 fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'publishers')
@@ -36,3 +38,26 @@ class TestRobotPublisherPlugin(object):
 class TestTriggerParameterizedBuilds(object):
     def test_comparison(self):
         compare_jjb_output(fixtures_path, "trigger-parameterized-builds", "trigger-parameterized-builds")
+
+
+class TestExtendedEmailPublisher(unittest.TestCase):
+    def test_email_ext_with_multiple_triggers(self):
+        compare_jjb_output(fixtures_path, "email-ext-with-multiple-triggers", "email-ext")
+
+    def test_email_ext_with_single_trigger(self):
+        compare_jjb_output(fixtures_path, "email-ext-with-single-trigger", "email-ext")
+
+    def test_email_ext_with_multiple_different_triggers_001(self):
+        filename = os.path.join(fixtures_path, 'email-ext-with-multiple-different-triggers001.xml')
+        root = get_xml_root(filename=filename)
+        assert root is not None
+        with self.assertRaises(NotImplementedError):
+            extendedemailpublisher(root, None)
+
+    def test_email_ext_with_multiple_different_triggers_002(self):
+        filename = os.path.join(fixtures_path, 'email-ext-with-multiple-different-triggers002.xml')
+        root = get_xml_root(filename=filename)
+        assert root is not None
+        with self.assertRaises(NotImplementedError):
+            extendedemailpublisher(root, None)
+

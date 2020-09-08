@@ -1,0 +1,43 @@
+- job:
+    name: email-ext
+    project-type: freestyle
+    publishers:
+    - email-ext:
+        aborted: true
+        always: true
+        attach-build-log: false
+        attachments: '*/foo*.log'
+        body: The build has finished
+        compress-log: false
+        content-type: html
+        disable-publisher: false
+        failure: true
+        first-failure: true
+        first-unstable: true
+        fixed: true
+        fixed-unhealthy: true
+        from: lorem@ipsum.dolor
+        improvement: true
+        matrix-trigger: only-configurations
+        not-built: true
+        postsend-script: cancel=true
+        pre-build: true
+        presend-script: cancel=true
+        recipients: foo@example.com, bar@example.com
+        regression: true
+        reply-to: foo@example.com
+        save-output: true
+        second-failure: true
+        send-to:
+        - upstream-committers
+        - developers
+        - requester
+        - culprits
+        - recipients
+        - failing-test-suspects-recipients
+        - first-failing-build-suspects-recipients
+        still-failing: true
+        still-unstable: true
+        subject: Subject for Build ${BUILD_NUMBER}
+        success: true
+        unstable: true
