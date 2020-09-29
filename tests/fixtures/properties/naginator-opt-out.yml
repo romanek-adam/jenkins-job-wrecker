@@ -2,4 +2,5 @@
    name: naginator-opt-out
    project-type: freestyle
    properties:
-     - naginator-opt-out: false
+     - naginator-opt-out:
+        opt-out: false
